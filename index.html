@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Simple Form</title>
+  </head>
+  <style>
+    div { margin: 5px; }
+    
+  </style>
+  <body>
+        <div>
+          <label for="first_name">First Name </label>
+          <input type="text" name="first_name" id="first_name"/>
+          <span id="first_name_error"></span>
+        </div>
+        <div>
+          <label for="last_name">Last Name  </label>
+          <input type="text" name="last_name" id="last_name"/>
+          <span id="last_name_error"></span>
+        </div>
+        <div>
+          <label for="phone">Phone</label>
+          <input type="number" name="phone" id="phone"/>
+          <span id="phone_error"></span>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input type="email" name="email" id="email"/>
+          <span id="email_error"></span>
+        </div>
+    <div>
+      <button type="submit">Submit</button>
+      <button type="reset">Clear</button>
+    </div>
+  </body>
+</html>
