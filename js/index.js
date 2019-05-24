@@ -60,6 +60,8 @@ function clear() {
     errorSpans.forEach(s => s.innerHTML = '');
 }
 
+form().addEventListener('reset', clear);
+
 function validate() {
     clear();
     for (const validator of validations) {
