@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <title>Simple Form</title>
+    <!-- defer has 97% support -->
+    <script src="js/index.js" defer></script>
   </head>
   <style>
     div { margin: 5px; }
@@ -9,7 +11,7 @@
     
   </style>
   <body>
-    <form onsubmit="return validate()">
+    <form method="POST" onsubmit="return validate()">
           <div>
             <label for="first_name">First Name </label>
             <input type="text" name="first_name" id="first_name"/>
@@ -22,12 +24,12 @@
           </div>
           <div>
             <label for="phone">Phone</label>
-            <input type="number" name="phone" id="phone"/>
+            <input type="text" name="phone" id="phone"/>
             <span class="error" id="phone_error"></span>
           </div>
           <div>
             <label for="email">Email</label>
-            <input type="email" name="email" id="email"/>
+            <input type="text" name="email" id="email"/>
             <span class="error" id="email_error"></span>
           </div>
       <div>
@@ -35,6 +37,5 @@
         <button type="reset">Clear</button>
       </div>
     </form>
-    <script src="js/index.js"></script>
   </body>
 </html>

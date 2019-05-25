@@ -1,78 +1,98 @@
+let form;
 
-function isEmpty(str) {
-    return !str || str.trim().length == 0;
-}
-function isShort(str, len) {
-    return str.length < len;
-}
-function isLong(str, len) {
-    return str.length > len;
-}
-
-let _form;
-
-function form() {
-    if (!_form)
-        _form = document.forms[0];
-    return _form;
-}
-
-function validateField(name, msgOnError, validator) {
-    const input = form()[name];
-    if (!validator(input.value)) {
-        setError(name, msgOnError);
-        return false;
-    }
-    return true;
+const fields = {
+    first_name: {
+        label: 'First Name',
+        min_len: 3,
+        max_len: 32
+    },
+    last_name: {
+        label: 'Last Name',
+        min_len: 3,
+        max_len: 32
+    },
+    phone: {
+        label: 'Phone Number',
+        min_len: 10,
+        max_len: 13,
+        validations: [
+            {
+                validator: s => /^\d+$/.test(s),
+                msgOnError: 'only numbers are allowed'
+            }
+        ]
+    },
+    email: {
+        label: 'Email address',
+        validations: [
+            {
+                validator: s => /^\w{3,}@\w{3,}\.\w{2,4}$/.test(s),
+                msgOnError: 'invalid email address'
+            }
+        ]
+    },
 }
 
 function setError(name, msgOnError) {
-    document.getElementById(name.concat('_error')).innerHTML = msgOnError
+    const field = fields[name];
+
+    if (!field.errorSpan)
+        field.errorSpan = document.getElementById(name.concat('_error'));
+
+    field.errorSpan.innerHTML = msgOnError
 }
 
-const FIRST_NAME = 0,
-    LAST_NAME = 1,
-    PHONE = 2,
-    EMAIL = 3;
-
-const form_names = ['first_name', 'last_name', 'phone', 'email'];
-const form_lebels = ['First Name', 'Last Name', 'Phone number', 'Email address'];
-const validations = [];
-
-function addValidation(index, validator, errorFormatter) {
-    validations.push(() => validateField(form_names[index], errorFormatter(form_lebels[index], form_names[index]), validator));
-}
-function addCheck(index, min_len, max_len) {
-    addValidation(index, s => !isEmpty(s), s => `${s} cannot be empty`);
-
-    if (min_len || min_len === 0)
-        addValidation(index, s => !isShort(s, min_len), s => `${s} cannot be shorter than ${min_len} charators`);
-    if (max_len || max_len === 0)
-        addValidation(index, s => !isLong(s, max_len), s => `${s} cannot be longer than ${max_len} charators`);
+function invokeValidations(name, value, validations) {
+    for (const validation of validations) {
+        if (!validation.validator(value)) {
+            setError(name, validation.msgOnError);
+            return false;
+        }
+        return true;
+    }
 }
 
-//Magic Numbers
-addCheck(FIRST_NAME, 3, 32);
-addCheck(LAST_NAME, 3, 32);
-addCheck(PHONE, 10, 13);
+function performChecks(name) {
+    const str = form[name].value,
+        field = fields[name],
+        min_len = field.min_len,
+        max_len = field.max_len;
 
-addCheck(EMAIL);
-addValidation(EMAIL, email => !(/^\w{3,}@\w{3,}\\.\w{2,4}$/.test(email)), () => "invalid email address");
+    if (!str || str.trim().length == 0)
+        setError(name, `${field.label} cannot be empty`);
+    else if ((min_len || min_len === 0) && str.length < min_len)
+        setError(name, `${field.label} cannot be shorter than ${min_len} charators`);
+    else if ((max_len || max_len === 0) && str.length > max_len)
+        setError(name, `${field.label} cannot be longer than ${max_len} charators`);
+    else if(field.validations && !invokeValidations(name, str, field.validations)) {
+        // setting error is handled by  invokeValidations
+    } else
+        return true;
 
-let errorSpans;
+    return false;
+}
+
+const names = Object.keys(fields);
+
 function clear() {
-    if (!errorSpans)
-        errorSpans = form_names.map(s => document.getElementById(s.concat("_error")));
-    errorSpans.forEach(s => s.innerHTML = '');
+    names.forEach(k => setError(k, ''));
 }
-
-form().addEventListener('reset', clear);
 
 function validate() {
-    clear();
-    for (const validator of validations) {
-        if (!validator())
-            return false;
+    try {
+        if (!form) {
+            form = document.forms[0];
+            form.addEventListener('reset', clear);
+        }
+
+        clear();
+        for (const name of names) {
+            if (!performChecks(name))
+                return false;
+        }
+        return true;
+    } catch (error) {
+        console.error(error);
+        return false;
     }
-    return true;
 }
