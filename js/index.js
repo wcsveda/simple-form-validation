@@ -58,6 +58,8 @@ function performChecks(name) {
         min_len = field.min_len,
         max_len = field.max_len;
 
+    /**
+     * 
     if (!str || str.trim().length == 0)
         setError(name, `${field.label} cannot be empty`);
     else if ((min_len || min_len === 0) && str.length < min_len)
@@ -68,14 +70,31 @@ function performChecks(name) {
         // setting error is handled by  invokeValidations
     } else
         return true;
+     */
 
+    switch (true) {
+        case !str || str.trim().length == 0:
+            setError(name, `${field.label} cannot be empty`);
+            break;
+        case (min_len || min_len === 0) && str.length < min_len:
+            setError(name, `${field.label} cannot be shorter than ${min_len} charactors`);
+            break;
+        case (max_len || max_len === 0) && str.length > max_len:
+            setError(name, `${field.label} cannot be longer than ${max_len} charactors`);
+            break;
+        case field.validations && !invokeValidations(name, str, field.validations):
+            // setting error is handled by  invokeValidations
+            break;
+        default:
+            return true;
+    }
     return false;
 }
 
 const names = Object.keys(fields);
 
 function clear() {
-    names.forEach(k => setError(k, ''));
+    names.forEach(name => setError(name, ''));
 }
 
 function validate() {
